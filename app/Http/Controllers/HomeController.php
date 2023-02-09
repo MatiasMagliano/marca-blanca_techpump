@@ -51,20 +51,26 @@ class HomeController extends Controller
     public function reload()
     {
         /*
-        * Aquí se podría aplicar el mismo estilo que en index(),
-        * pero depende de las especificaciones de la tarea...
+        * Se cachea el json obtenido de la API de cumlouder
         */
         $json = Http::get('https://webcams.cumlouder.com/feed/webcams/online/61/1/');
-        $url_base = 'https://webcams.cumlouder.com/joinmb/cumlouder/';
 
-        $personas = json_decode($json->body());
-
-        foreach($personas as $persona)
+        // se controla que el servicio esté online
+        if($json->getStatusCode() == 200)
         {
-            $chicas[] = [
-                'link' => $url_base . $persona->wbmerPermalink .'/?nats=',
-                'nombre'    => $persona->wbmerNick,
-            ];
+            $url_base = 'https://webcams.cumlouder.com/joinmb/cumlouder/';
+            $url_images = 'https://w0.imgcm.com/modelos/';
+
+            $personas = json_decode($json->body());
+
+            foreach($personas as $persona)
+            {
+                $chicas[] = [
+                    'link'      => $url_base . $persona->wbmerPermalink .'/?nats=',
+                    'nombre'    => $persona->wbmerNick,
+                    'imagen'    => $url_images . $persona->wbmerThumb1,
+                ];
+            }
         }
 
         return view('reload', ['chicas' => $chicas])->render();
