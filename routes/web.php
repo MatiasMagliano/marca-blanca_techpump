@@ -15,4 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('reload', [HomeController::class, 'reload'])->name('reload');
+
+// Route::middleware([CheckCachedData::class])->group(function(){
+//     Route::get('reload', [HomeController::class, 'reload'])->name('reload');
+// });
+
+Route::get('reload', [HomeController::class, 'reload'])->middleware(['checkCachedData'])->name('reload');

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\URL;
 
 class HomeController extends Controller
@@ -11,7 +11,7 @@ class HomeController extends Controller
     {
         /*
         * El controlador determina el tipo de template en css a aplicar de acuerdo
-        * a la configuración presente en config/site-config.php
+        * a la configuración presente en config/site-config.php parseando
         */
 
         $url = parse_url(URL::full(), PHP_URL_HOST);
@@ -51,26 +51,20 @@ class HomeController extends Controller
     public function reload()
     {
         /*
-        * Se cachea el json obtenido de la API de cumlouder
+        * Se sacan los datos siempre del cache
         */
-        $json = Http::get('https://webcams.cumlouder.com/feed/webcams/online/61/1/');
+        $personas = Cache::get('listado_chicas');
 
-        // se controla que el servicio esté online
-        if($json->getStatusCode() == 200)
+        $url_base = 'https://webcams.cumlouder.com/joinmb/cumlouder/';
+        $url_images = 'https://w0.imgcm.com/modelos/';
+
+        foreach($personas as $persona)
         {
-            $url_base = 'https://webcams.cumlouder.com/joinmb/cumlouder/';
-            $url_images = 'https://w0.imgcm.com/modelos/';
-
-            $personas = json_decode($json->body());
-
-            foreach($personas as $persona)
-            {
-                $chicas[] = [
-                    'link'      => $url_base . $persona->wbmerPermalink .'/?nats=',
-                    'nombre'    => $persona->wbmerNick,
-                    'imagen'    => $url_images . $persona->wbmerThumb1,
-                ];
-            }
+            $chicas[] = [
+                'link'      => $url_base . $persona->wbmerPermalink .'/?nats=',
+                'nombre'    => $persona->wbmerNick,
+                'imagen'    => $url_images . $persona->wbmerThumb1,
+            ];
         }
 
         return view('reload', ['chicas' => $chicas])->render();

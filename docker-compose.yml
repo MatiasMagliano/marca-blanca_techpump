@@ -1,0 +1,28 @@
+version: "2.15.1"
+
+services:
+    # servicio PHP
+    php:
+        container_name: debian-php
+        build:
+            context: .
+            target: php
+            args:
+                - APP_ENV=${APP_ENV}
+        environment:
+            - APP_ENV=${APP_ENV}
+            - CONTAINER_ROLE=app
+        working_dir: /var/www
+        volumes:
+            - ./://var/www
+        ports:
+            - 8000:8000
+        depends_on:
+            - memcached
+
+    # servicio memcached
+    memcached:
+        container_name: memcached
+        image: memcached:latest
+        ports:
+            - 11211:11211

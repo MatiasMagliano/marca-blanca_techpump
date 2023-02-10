@@ -77,9 +77,9 @@
                 cargar_chicas();
 
                 // se coloca un timer que recargue cada 15 minutos
-                setInterval(() => {
-                    cargar_chicas();
-                }, 900000);
+                // setInterval(() => {
+                //     cargar_chicas();
+                // }, 900000);
 
                 // simplemodal
                 $('.chica').click(function (e) {
